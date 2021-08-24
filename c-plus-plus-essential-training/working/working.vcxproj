@@ -98,7 +98,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE </PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -140,19 +140,34 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bit_fields.cpp" />
+    <ClCompile Include="animal.cpp" />
+    <ClCompile Include="character_io.cpp" />
     <ClCompile Include="data_types.cpp" />
     <ClCompile Include="dynamic_memory_operations.cpp" />
+    <ClCompile Include="func.cpp" />
+    <ClCompile Include="numeric.cpp" />
     <ClCompile Include="pointers.cpp" />
     <ClCompile Include="primitive_arrays.cpp" />
     <ClCompile Include="primitive_string.cpp" />
     <ClCompile Include="range_based_for_loop.cpp" />
+    <ClCompile Include="rational.cpp" />
+    <ClCompile Include="file_management.cpp" />
+    <ClCompile Include="sl_file_io.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="references.cpp" />
+    <ClCompile Include="stl_vectors.cpp" />
+    <ClCompile Include="string_functions.cpp" />
     <ClCompile Include="structured_data.cpp" />
     <ClCompile Include="structures.cpp" />
+    <ClCompile Include="system_errors.cpp" />
+    <ClCompile Include="templates.cpp" />
+    <ClCompile Include="template_classes.cpp" />
     <ClCompile Include="typeid.cpp" />
     <ClCompile Include="type_cast.cpp" />
     <ClCompile Include="unions.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="func.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
