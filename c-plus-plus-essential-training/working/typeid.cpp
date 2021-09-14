@@ -15,7 +15,7 @@ B b1;
 B b2;
 
 
-int main() {
+int type_id() {
 	if (typeid(a1) == typeid(A)) {
 		puts("same");
 	}
@@ -23,4 +23,4 @@ int main() {
 		puts("different");
 	}
 	return 0;
-}
+} 

@@ -141,12 +141,12 @@
   <ItemGroup>
     <ClCompile Include="bit_fields.cpp" />
     <ClCompile Include="data_types.cpp" />
+    <ClCompile Include="davaleba-1-a.cpp" />
     <ClCompile Include="dynamic_memory_operations.cpp" />
     <ClCompile Include="pointers.cpp" />
     <ClCompile Include="primitive_arrays.cpp" />
     <ClCompile Include="primitive_string.cpp" />
     <ClCompile Include="range_based_for_loop.cpp" />
-    <ClCompile Include="Source.cpp" />
     <ClCompile Include="references.cpp" />
     <ClCompile Include="structured_data.cpp" />
     <ClCompile Include="structures.cpp" />
