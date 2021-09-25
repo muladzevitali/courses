@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 def get_cart_id(request):
@@ -23,6 +24,18 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f'{self.cart} - {self.product}'
+
+    @property
+    def increment_cart_item_quantity_url(self):
+        return reverse('increment_cart_item_quantity', args=[self.id])
+
+    @property
+    def decrement_cart_item_quantity_url(self):
+        return reverse('decrement_cart_item_quantity', args=[self.id])
+
+    @property
+    def remove_cart_item_url(self):
+        return reverse('remove_cart_item', args=[self.id])
 
     @property
     def total(self):
