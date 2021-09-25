@@ -20,3 +20,39 @@ class Product(models.Model):
     @property
     def url(self):
         return reverse('product_detail', args=[self.category.slug, self.slug])
+
+    @property
+    def add_to_cart_url(self):
+        return reverse('add_to_cart', args=[self.id])
+
+    @property
+    def remove_from_cart_url(self):
+        return reverse('remove_from_cart', args=[self.id])
+
+    @property
+    def remove_cart_item_url(self):
+        return reverse('remove_cart_item', args=[self.id])
+
+
+class VariationManager(models.Manager):
+    def colors(self):
+        return super().filter(category='color', is_active=True)
+
+    def sizes(self):
+        return super().filter(category='size', is_active=True)
+
+
+class Variation(models.Model):
+    category_choices = (
+        ('color', 'Color'),
+        ('size', 'Size'),
+    )
+    product = models.ForeignKey('store.Product', on_delete=models.CASCADE)
+    category = models.CharField(max_length=100, choices=category_choices)
+    name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    objects = VariationManager()
+
+    def __str__(self):
+        return f'{self.product} - {self.category} - {self.name}'
