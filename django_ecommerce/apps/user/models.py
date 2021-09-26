@@ -1,23 +1,24 @@
+from secrets import token_hex
+
 from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager)
 from django.db import models
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, first_name, last_name, username, email, password=None):
+    def create_user(self, first_name, last_name, email, password=None):
         if not email:
             raise ValueError('Email is required')
-        if not username:
-            raise ValueError('Username is required')
 
         user = self.model(first_name=first_name, last_name=last_name,
-                          email=self.normalize_email(email), username=username)
+                          email=self.normalize_email(email))
+        user.generate_username()
         user.set_password(password)
         user.save(using=self.db)
 
         return user
 
-    def create_superuser(self, first_name, last_name, username, email, password=None):
-        user = self.create_user(first_name, last_name, username, email, password)
+    def create_superuser(self, first_name, last_name, email, password=None):
+        user = self.create_user(first_name, last_name, email, password)
         user.is_superuser = True
         user.is_admin = True
         user.is_staff = True
@@ -49,6 +50,10 @@ class User(AbstractBaseUser):
 
     def has_perm(self, perm, obj=None):
         return self.is_admin
+
+    def generate_username(self):
+        self.username = token_hex(6)
+        self.save()
 
     def has_module_perms(self, add_label):
         return True

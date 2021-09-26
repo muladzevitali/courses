@@ -1,0 +1,9 @@
+{% autoescape off %}
+    Hi {{ user.first_name }},
+    For Activation you account click the link below:
+    http://{{ domain }}{% url 'user_activation' uid=uid token=token %}
+
+    If you think it's not you, please ignore this email
+
+    Thanks
+{% endautoescape %}

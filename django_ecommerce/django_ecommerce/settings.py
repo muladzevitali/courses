@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 
+from django.contrib.messages import constants as messages
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -74,6 +76,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'django_ecommerce.wsgi.application'
 
 AUTH_USER_MODEL = 'user.User'
+LOGIN_URL = 'login'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -129,3 +132,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT = BASE_DIR.joinpath('media')
 MEDIA_URL = '/media/'
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger',
+    messages.SUCCESS: 'success',
+}
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'django.email.vm@gmail.com'
+EMAIL_HOST_PASSWORD = 'Chanchura1'
+EMAIL_USE_TLS = True
