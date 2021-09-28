@@ -5,7 +5,7 @@ from apps.store.models import (Product, Variation)
 from .models import (Cart, CartItem, get_cart_id)
 
 
-def _get_cart_info(request):
+def get_cart_info(request):
     if request.user.is_authenticated:
         cart_items = CartItem.objects.filter(user=request.user, is_active=True)
     else:
@@ -23,7 +23,7 @@ def _get_cart_info(request):
 
 
 def cart_index(request):
-    context = _get_cart_info(request)
+    context = get_cart_info(request)
 
     return render(request, 'cart/cart.html', context=context)
 
@@ -97,6 +97,6 @@ def decrement_cart_item_quantity(request, cart_item_id):
 
 @login_required()
 def checkout(request):
-    context = _get_cart_info(request)
+    context = get_cart_info(request)
 
     return render(request, 'cart/checkout.html', context=context)

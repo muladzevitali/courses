@@ -5,7 +5,7 @@
         <div class="container">
 
             <div class="row">
-                <form action="" class="form-row">
+                <form action="{% url 'place_order' %}" class="form-row" method="post">
 
                     <aside class="col-lg-6">
 
@@ -32,9 +32,9 @@
                                                id="email"/>
                                     </div>
                                     <div class="col form-group">
-                                        <label for="phone_number">Phone number:</label>
-                                        <input type="tel" name="phone_number" class="form-control" required
-                                               id="phone_number"/>
+                                        <label for="phone">Phone number:</label>
+                                        <input type="text" name="phone" class="form-control" required
+                                               id="phone"/>
                                     </div>
                                 </div>
                                 <div class="form-row">
@@ -62,7 +62,7 @@
                                     </div>
                                     <div class="col form-group">
                                         <label for="country">Country:</label>
-                                        <input type="text" name="country" class="form-control" disabled value="Georgia"
+                                        <input type="text" name="country" class="form-control" value="Georgia"
                                                id="country"/>
                                     </div>
                                 </div>
@@ -124,14 +124,15 @@
                                     </tbody>
                                 </table>
 
-                                <a href="../place-order.html" class="btn btn-primary btn-block"> Place Order </a>
+                                <button type="submit" class="btn btn-primary btn-block"> Place Order</button>
                                 <a href="{% url 'store' %}" class="btn btn-light btn-block">Continue Shopping</a>
                             </div> <!-- card-body.// -->
                         </div> <!-- card.// -->
 
                     </aside> <!-- col.// -->
                 </form>
-
+                {{ form.errors }}
+                {{ form.field_errors }}
 
             </div> <!-- row.// -->
             <!-- ============================ COMPONENT 1 END .// ================================= -->
