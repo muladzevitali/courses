@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import (urlsafe_base64_encode, urlsafe_base64_decode)
 
+from apps.cart.models import (CartItem, get_cart_id)
 from . import forms
 from .models import User
 
@@ -57,8 +58,25 @@ def login(request):
         user = auth.authenticate(email=form.cleaned_data['email'], password=form.cleaned_data['password'])
 
         if user:
+            current_cart_items = CartItem.objects.filter(cart__cart_id=get_cart_id(request)).all()[::1]
+
+            current_variations = [list(item.variations.all()) for item in current_cart_items]
+
+            user_cart_items = CartItem.objects.filter(user=user).all()
+            for cart_item in user_cart_items:
+                item_variations = list(cart_item.variations.all())
+                if item_variations in current_variations:
+                    current_cart_item = current_cart_items.pop(current_variations.index(item_variations))
+
+                    cart_item.quantity += current_cart_item.quantity
+                    cart_item.save()
+
+            for cart_item in current_cart_items:
+                cart_item.user = user
+                cart_item.save()
+
             auth.login(request, user)
-            return redirect('dashboard')
+            return redirect(request.POST.get('next') or 'dashboard')
 
         messages.error(request, 'Invalid login credentials')
         return redirect('login')

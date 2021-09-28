@@ -3,7 +3,8 @@
     <!-- ========================= SECTION CONTENT ========================= -->
     <section class="section-conten padding-y" style="min-height:84vh">
         {% if request.GET.command and request.GET.email %}
-            <div class="container mx-auto alert alert-info text-center" role="alert" style="max-width: 580px; margin-top:100px;">
+            <div class="container mx-auto alert alert-info text-center" role="alert"
+                 style="max-width: 580px; margin-top:100px;">
                 <p>Thank you for registering on our website. We have sent a verification email to you
                     at: [{{ request.GET.email }}]</p>
 
@@ -19,6 +20,8 @@
 
                 <form action="{% url 'login' %}" method="post">
                     {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.GET.next }}"/>
+
                     <div class="form-group">
                         {{ form.email }}
                     </div> <!-- form-group// -->
