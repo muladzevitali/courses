@@ -45,6 +45,14 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
+    @property
+    def full_address(self):
+        return f'{self.address_line_1} {self.address_line_2}'
+
     def __str__(self):
         return f'{self.order_number} - {self.user}'
 
@@ -63,14 +71,16 @@ class OrderProduct(models.Model):
     payment = models.ForeignKey('order.Payment', on_delete=models.SET_NULL, null=True, blank=True)
     user = models.ForeignKey('user.User', on_delete=models.CASCADE)
     product = models.ForeignKey('store.Product', on_delete=models.CASCADE)
-    variation = models.ForeignKey('store.Variation', on_delete=models.CASCADE)
-    color = models.CharField(max_length=50)
-    size = models.CharField(max_length=50)
+    variations = models.ManyToManyField('store.Variation', blank=True)
     quantity = models.SmallIntegerField()
     product_price = models.FloatField()
     is_ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def order_product_total(self):
+        return self.quantity * self.product_price
 
     def __str__(self):
         return f'{self.order} - {self.user}'
