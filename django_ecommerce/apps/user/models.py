@@ -55,5 +55,9 @@ class User(AbstractBaseUser):
         self.username = token_hex(6)
         self.save()
 
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
     def has_module_perms(self, add_label):
         return True

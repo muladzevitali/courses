@@ -111,7 +111,6 @@ def order_complete(request):
     order_products = order.orderproduct_set.all()
     total = sum(order_product.product_price * order_product.quantity for order_product in order_products)
     tax = 0.02 * total
-    grand_total = total + tax
 
     context = dict(order=order, order_products=order_products, payment=payment, total=total)
 
