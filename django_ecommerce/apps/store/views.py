@@ -35,10 +35,10 @@ def product_detail(request, category_slug, product_slug):
 
     in_cart = CartItem.objects.filter(cart__cart_id=get_cart_id(request), product=product).exists()
     is_purchased = OrderProduct.objects.filter(user_id=request.user.id, product=product).exists()
-    reviews = ReviewRating.objects.filter(product=product, is_active=True)
+    reviews = ReviewRating.objects.filter(product=product, is_active=True)[:5]
 
     context = dict(product=product, in_cart=in_cart, is_purchased=is_purchased, reviews=reviews,
-                   average_rating=product.average_rating)
+                   average_rating=product.average_rating, reviews_count=product.reviews_count)
     return render(request, 'store/product_detail.html', context=context)
 
 

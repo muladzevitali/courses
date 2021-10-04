@@ -1,6 +1,6 @@
 from django.db import models
 from django.urls import reverse
-from django.db.models.aggregates import Avg
+from django.db.models.aggregates import (Avg, Count)
 
 
 class Product(models.Model):
@@ -24,6 +24,13 @@ class Product(models.Model):
         average = aggregation.get('average', 0)
 
         return average
+
+    @property
+    def reviews_count(self):
+        aggregation = ReviewRating.objects.filter(product=self, is_active=True).aggregate(count=Count('rating'))
+        count = aggregation.get('count', 0)
+
+        return count
 
     @property
     def url(self):
