@@ -11,7 +11,8 @@ from django.utils.http import (urlsafe_base64_encode, urlsafe_base64_decode)
 
 from apps.cart.models import (CartItem, get_cart_id)
 from . import forms
-from .models import User
+from .models import (User, UserProfile)
+from apps.order.models import Order
 
 
 def register(request):
@@ -29,6 +30,8 @@ def register(request):
             user = User.objects.create_user(first_name, last_name, email, password)
             user.phone_number = phone_number
             user.save()
+
+            UserProfile(user=user, profile_picture='users/default-user.png').save()
 
             subject = 'Please activate you account'
             message = render_to_string('auth/account_verification_email.html', {
@@ -112,7 +115,11 @@ def user_activation(request, uid, token):
 
 @login_required()
 def dashboard(request):
-    return render(request, 'auth/dashboard.html')
+    orders = Order.objects.filter(user=request.user, is_ordered=True)
+    user_profile = UserProfile.objects.get(user=request.user)
+
+    context = dict(orders_count=orders.count(), user_profile=user_profile)
+    return render(request, 'user/dashboard.html', context=context)
 
 
 def forgot_password(request):
@@ -181,3 +188,60 @@ def reset_password(request):
 
     context = dict(form=form)
     return render(request, 'auth/reset_password.html', context=context)
+
+
+@login_required()
+def my_orders(request):
+    orders = Order.objects.filter(user=request.user, is_ordered=True).order_by('-created_at')
+    context = dict(orders=orders)
+    return render(request, 'user/my-orders.html', context=context)
+
+
+@login_required()
+def edit_profile(request):
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+    user_form = forms.UserForm(instance=request.user)
+    profile_form = forms.UserProfileForm(instance=user_profile)
+    if request.method == 'POST':
+        user_form = forms.UserForm(request.POST, instance=request.user)
+        profile_form = forms.UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+
+            messages.success(request, 'Your profile has been updated.')
+            return redirect('edit_profile')
+        messages.error(request, 'Invalid input.')
+
+    context = dict(user_form=user_form, profile_form=profile_form, user_profile=user_profile)
+    return render(request, 'user/edit-profile.html', context=context)
+
+
+@login_required()
+def change_password(request):
+    change_password_form = forms.ChangePasswordForm()
+    if request.method == 'POST':
+        change_password_form = forms.ChangePasswordForm(request.POST)
+        if not change_password_form.is_valid():
+            messages.error(request, 'Invalid input.')
+
+            return redirect('change_password')
+
+        current_password = change_password_form.cleaned_data['current_password']
+        new_password = change_password_form.cleaned_data['new_password']
+        user = request.user
+        if not user.check_password(current_password):
+            messages.error(request, 'Invalid password')
+
+            return redirect('change_password')
+
+        user.set_password(new_password)
+        user.save()
+
+        auth.login(request, user)
+        messages.success(request, 'Password has been changed successfully')
+
+        return redirect('change_password')
+
+    context = dict(change_password_form=change_password_form)
+    return render(request, 'user/change-password.html', context=context)

@@ -9,11 +9,21 @@
                 <div class="row no-gutters">
                     <aside class="col-md-6">
                         <article class="gallery-wrap">
-                            <div class="img-big-wrap">
-                                <a href="#"><img src="{{ product.images.url }}"></a>
+                            <div class="img-big-wrap main-image">
+                                <img src="{{ product.images.url }}" alt="Product main image">
                             </div> <!-- img-big-wrap.// -->
 
-                        </article> <!-- gallery-wrap .end// -->
+                        </article>
+                        <ul class="thumb">
+                            <li>
+                                <a href="{{ product.images.url }}" target="main-image"><img
+                                        src="{{ product.images.url }}" alt="Product main image"></a>
+                                {% for image in product_gallery %}
+                                    <a href="{{ image.image.url }}" target="main-image"><img alt="Product image"
+                                                                                             src="{{ image.image.url }}"></a>
+                                {% endfor %}
+                            </li>
+                        </ul>
                     </aside>
                     <main class="col-md-6 border-left">
                         <form action="{{ product.add_to_cart_url }}" method="post">
@@ -193,10 +203,19 @@
                         {% endfor %}
                     </header>
 
-                </div> <!-- col.// -->
-            </div> <!-- row.// -->
+                </div>
+            </div>
 
-
-        </div> <!-- container .//  -->
+        </div>
     </section>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.thumb a').click(function (e) {
+                e.preventDefault();
+                $('.main-image img').attr('src', $(this).attr('href'));
+            })
+
+        });
+        // jquery end
+    </script>
 {% endblock %}

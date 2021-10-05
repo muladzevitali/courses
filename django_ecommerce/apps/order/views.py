@@ -110,8 +110,17 @@ def order_complete(request):
     order = get_object_or_404(Order, order_number=order_number, payment=payment, is_ordered=True)
     order_products = order.orderproduct_set.all()
     total = sum(order_product.product_price * order_product.quantity for order_product in order_products)
-    tax = 0.02 * total
 
     context = dict(order=order, order_products=order_products, payment=payment, total=total)
 
     return render(request, 'order/order-complete.html', context=context)
+
+
+@login_required()
+def order_detail(request, order_number: int):
+    order = get_object_or_404(Order, order_number=order_number, user=request.user)
+    order_details = OrderProduct.objects.filter(order=order, user=request.user)
+    total = sum(detail.quantity * detail.product_price for detail in order_details)
+
+    context = dict(order_detail=order_details, order=order, total=total)
+    return render(request, 'order/order-detail.html', context=context)

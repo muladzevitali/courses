@@ -2,6 +2,7 @@ from django.urls import path
 
 from . import views
 
+
 urlpatterns = [
     path('', views.dashboard, name='dashboard'),
     path('register/', views.register, name='register'),
@@ -13,4 +14,8 @@ urlpatterns = [
     path('reset-password', views.reset_password, name='reset_password'),
     path('reset-password-validate/<str:uid>/<str:token>/', views.reset_password_validate,
          name='reset_password_validate'),
+    path('my-orders/', views.my_orders, name='my_orders'),
+    path('edit-profile/', views.edit_profile, name='edit_profile'),
+    path('change-password/', views.change_password, name='change_password'),
+
 ]

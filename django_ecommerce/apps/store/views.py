@@ -8,7 +8,7 @@ from apps.cart.models import (CartItem, get_cart_id)
 from apps.category.models import Category
 from apps.order.models import OrderProduct
 from . import forms
-from .models import (Product, ReviewRating)
+from .models import (Product, ReviewRating, ProductGallery)
 
 
 def store(request, category_slug=None):
@@ -36,9 +36,10 @@ def product_detail(request, category_slug, product_slug):
     in_cart = CartItem.objects.filter(cart__cart_id=get_cart_id(request), product=product).exists()
     is_purchased = OrderProduct.objects.filter(user_id=request.user.id, product=product).exists()
     reviews = ReviewRating.objects.filter(product=product, is_active=True)[:5]
-
+    product_gallery = ProductGallery.objects.filter(product=product)
     context = dict(product=product, in_cart=in_cart, is_purchased=is_purchased, reviews=reviews,
-                   average_rating=product.average_rating, reviews_count=product.reviews_count)
+                   average_rating=product.average_rating, reviews_count=product.reviews_count,
+                   product_gallery=product_gallery)
     return render(request, 'store/product_detail.html', context=context)
 
 

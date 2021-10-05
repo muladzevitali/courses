@@ -21,14 +21,14 @@ class Product(models.Model):
     @property
     def average_rating(self):
         aggregation = ReviewRating.objects.filter(product=self, is_active=True).aggregate(average=Avg('rating'))
-        average = aggregation.get('average', 0)
+        average = aggregation.get('average', 0) or 0
 
         return average
 
     @property
     def reviews_count(self):
         aggregation = ReviewRating.objects.filter(product=self, is_active=True).aggregate(count=Count('rating'))
-        count = aggregation.get('count', 0)
+        count = aggregation.get('count', 0) or 0
 
         return count
 
@@ -86,3 +86,15 @@ class ReviewRating(models.Model):
 
     def __str__(self):
         return f'{self.subject}'
+
+
+class ProductGallery(models.Model):
+    product = models.ForeignKey('store.Product', on_delete=models.CASCADE, default=None)
+    image = models.ImageField(upload_to='photos/products', max_length=255)
+
+    class Meta:
+        verbose_name = 'Product gallery'
+        verbose_name_plural = 'Product gallery'
+
+    def __str__(self):
+        return f'{self.product.name}'
