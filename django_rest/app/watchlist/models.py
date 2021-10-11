@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.core.validators import (MinValueValidator, MaxValueValidator)
 from django.db import models
 
@@ -19,6 +20,9 @@ class WatchList(models.Model):
     is_active = models.BooleanField(default=True)
     platform = models.ForeignKey(to='watchlist.StreamPlatform', on_delete=models.DO_NOTHING,
                                  related_name='watchlist')
+    average_rating = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(5)], default=0)
+    number_of_reviews = models.IntegerField(default=0)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -27,6 +31,7 @@ class WatchList(models.Model):
 
 
 class Reviews(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     watchlist = models.ForeignKey('watchlist.WatchList', on_delete=models.CASCADE, related_name='reviews')
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     description = models.CharField(max_length=200, null=True)

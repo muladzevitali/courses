@@ -1,10 +1,13 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import (mixins, generics, status, viewsets)
+from rest_framework import (generics, status, viewsets)
+from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from app.watchlist.models import (WatchList, StreamPlatform, Reviews)
 from app.watchlist.serializers import (WatchListSerializer, StreamPlatformSerializer, ReviewSerializer)
+from .permissions import (IsAdminOrReadOnly, IsReviewerOrReadOnly)
 
 
 class StreamPlatformListApiView(APIView):
@@ -66,14 +69,14 @@ class WatchListApiView(APIView):
 class WatchListDetailApiView(APIView):
     def get(self, request, pk):
         movie = get_object_or_404(WatchList, pk=pk)
-        serializer = WatchListSerializer(movie)
+        serializer = WatchListSerializer(movie, context=dict(request=self.request))
 
         return Response(serializer.data)
 
     def put(self, request, pk):
         movie = get_object_or_404(WatchList, pk=pk)
 
-        serializer = WatchListSerializer(instance=movie, data=request.data)
+        serializer = WatchListSerializer(instance=movie, data=request.data, context=dict(request=self.request))
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -87,28 +90,10 @@ class WatchListDetailApiView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ReviewList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
-    queryset = Reviews.objects.all()
-    serializer_class = ReviewSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
-
-class ReviewDetail(mixins.RetrieveModelMixin, generics.GenericAPIView):
-    queryset = Reviews.objects.all()
-    serializer_class = ReviewSerializer
-
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-
 class ReviewListGeneral(generics.ListCreateAPIView):
     queryset = Reviews.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         pk = self.kwargs['movie_id']
@@ -118,28 +103,25 @@ class ReviewListGeneral(generics.ListCreateAPIView):
 class ReviewDetailGeneral(generics.RetrieveUpdateDestroyAPIView):
     queryset = Reviews.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [IsAdminOrReadOnly, IsReviewerOrReadOnly]
 
 
 class ReviewCreate(generics.CreateAPIView):
     queryset = Reviews.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Reviews.objects.all()
 
     def perform_create(self, serializer):
         pk = self.kwargs['movie_id']
         watchlist = get_object_or_404(WatchList, pk=pk)
-        serializer.save(watchlist=watchlist)
+        if Reviews.objects.filter(watchlist=pk, user_id=self.request.user.id).exists():
+            raise ValidationError('You have already reviewed')
 
-
-class StreamPlatformViewSet(viewsets.ViewSet):
-    def list(self, request):
-        queryset = StreamPlatform.objects.all()
-        serializer = StreamPlatformSerializer(instance=queryset, many=True, context=dict(request=request))
-
-        return Response(serializer.data)
-
-    def retrieve(self, request, pk=None):
-        stream = get_object_or_404(StreamPlatform, pk=pk)
-
-        serializer = StreamPlatformSerializer(stream, context=dict(request=request))
-
-        return Response(serializer.data)
+        serializer.save(watchlist=watchlist, user=self.request.user)
+        watchlist.average_rating = (watchlist.average_rating * watchlist.number_of_reviews + serializer.validated_data[
+            'rating']) / (watchlist.number_of_reviews + 1)
+        watchlist.number_of_reviews += 1
+        watchlist.save()

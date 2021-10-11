@@ -5,6 +5,7 @@ from .models import (WatchList, StreamPlatform, Reviews)
 
 class ReviewSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='watchlist:review_detail')
+    user = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Reviews
