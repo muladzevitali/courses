@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import (generics, status, viewsets)
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import (generics, status, filters)
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -7,6 +8,8 @@ from rest_framework.views import APIView
 
 from app.watchlist.models import (WatchList, StreamPlatform, Reviews)
 from app.watchlist.serializers import (WatchListSerializer, StreamPlatformSerializer, ReviewSerializer)
+from . import pagination
+from . import throttling
 from .permissions import (IsAdminOrReadOnly, IsReviewerOrReadOnly)
 
 
@@ -93,7 +96,7 @@ class WatchListDetailApiView(APIView):
 class ReviewListGeneral(generics.ListCreateAPIView):
     queryset = Reviews.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticated]
+    throttle_classes = (throttling.ReviewListThrottle,)
 
     def get_queryset(self):
         pk = self.kwargs['movie_id']
@@ -125,3 +128,13 @@ class ReviewCreate(generics.CreateAPIView):
             'rating']) / (watchlist.number_of_reviews + 1)
         watchlist.number_of_reviews += 1
         watchlist.save()
+
+
+class UserReviews(generics.ListAPIView):
+    queryset = Reviews.objects.all()
+    serializer_class = ReviewSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['user__username', 'is_active']
+    search_fields = ('^description',)
+    ordering_fields = ('rating',)
+    pagination_class = pagination.ReviewPagination
