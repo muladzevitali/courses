@@ -4,6 +4,7 @@ import time
 from typing import Callable, Any
 
 from aiohttp import ClientSession
+import asyncpg
 
 
 def async_timed():
@@ -37,3 +38,7 @@ async def fetch_status(session: ClientSession, url: str, delay_seconds: int = 0)
     await asyncio.sleep(delay_seconds)
     async with session.get(url) as result:
         return result.status
+
+
+async def get_postgres_connection():
+    return await asyncpg.connect(host="localhost", port=5432, database="products", password="password")
