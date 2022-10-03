@@ -1,10 +1,11 @@
 import asyncio
 import functools
+import sys
 import time
 from typing import Callable, Any
 
-from aiohttp import ClientSession
 import asyncpg
+from aiohttp import ClientSession
 
 
 def async_timed():
@@ -42,3 +43,11 @@ async def fetch_status(session: ClientSession, url: str, delay_seconds: int = 0)
 
 async def get_postgres_connection():
     return await asyncpg.connect(host="localhost", port=5432, database="products", password="password")
+
+
+async def create_stdin_reader() -> asyncio.StreamReader:
+    stream_reader = asyncio.StreamReader()
+    protocol = asyncio.StreamReaderProtocol(stream_reader)
+    loop = asyncio.get_running_loop()
+    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
+    return stream_reader

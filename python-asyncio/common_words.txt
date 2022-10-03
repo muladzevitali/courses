@@ -195,7 +195,7 @@ mother
 world
 near
 build
-self
+cls
 earth
 father
 head

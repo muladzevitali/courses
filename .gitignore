@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 **venv/
 # C extensions
+.DS_Store
 *.so
 **idea/
 # Distribution / packaging
