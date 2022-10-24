@@ -1,0 +1,7 @@
+cython
+findspark
+spark-nlp==4.2.1
+numpy
+pandas
+py4j==0.10.9.5
+pyspark==3.3.0

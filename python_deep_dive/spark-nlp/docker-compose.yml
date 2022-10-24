@@ -1,0 +1,8 @@
+version: '3.7'
+
+services:
+  ana-worker:
+    platform: linux/amd64
+    build: .
+    container_name: anamze
+
