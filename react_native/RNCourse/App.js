@@ -10,7 +10,10 @@ export default function App() {
   };
 
   function addGoalHandler() {
-    setCourseGoals(currentCourseGoals => [...currentCourseGoals, enteredGoalText])
+    setCourseGoals(currentCourseGoals => [
+      ...currentCourseGoals, 
+      {text: enteredGoalText, key: Math.random().toString()}
+    ])
   };
 
   return (
@@ -24,16 +27,21 @@ export default function App() {
         <Button title='Add goal' onPress={addGoalHandler} />
       </View>
       <View style={styles.goalsContainer}>
-        <ScrollView alwaysBounceVertical={false}>
-          {courseGoals.map((goal) =>
-            <View style={styles.goalItemContainer} key={goal}>
-              <Text style={styles.goalItemText}>{goal}</Text>
-            </View>
-          )}
-        </ScrollView>
+        <FlatList
+          alwaysBounceVertical={false}
+          data={courseGoals}
+          renderItem={itemData => {
+            return (
+              <View style={styles.goalItemContainer}>
+                <Text style={styles.goalItemText}>{itemData.item.text}</Text>
+              </View>
+            )
+          }}
+          keyExtractor={(item, _) => item.key}
+        />
       </View>
     </View>
-  );
+  ); s
 }
 
 const styles = StyleSheet.create({
