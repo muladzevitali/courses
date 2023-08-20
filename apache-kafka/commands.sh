@@ -16,7 +16,7 @@ kafka-console-producer.sh --producer.config 7_playground.config --bootstrap-serv
 
 # 7_38 Kafka consumer
 kafka-topics.sh --command-config 7_playground.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic firstConsumerTopic --create --partitions 3;
-kafka-console-consumer.sh -consumer.config 7_playground.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic firstConsumerTopic;
+kafka-console-consumer.sh -consumer.config 7_playground.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic demo_java;
 kafka-console-producer.sh --producer.config 7_playground.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic firstConsumerTopic --producer-property partitioner.class=org.apache.kafka.clients.producer.RoundRobinPartitioner;
 kafka-console-consumer.sh -consumer.config 7_playground.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic firstConsumerTopic --from-beginning;
 kafka-console-consumer.sh -consumer.config 7_playground.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic firstConsumerTopic --from-beginning --formatter kafka.tools.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --property print.partition=true;
