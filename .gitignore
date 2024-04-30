@@ -131,3 +131,6 @@ dmypy.json
 .idea/
 **.vs/
 **Debug
+**node_modules/
+**.idea/
+**.expo/
