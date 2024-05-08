@@ -1,7 +1,7 @@
 import CategoriesScreen from './src/screens/CategoriesScreen';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native'
-
+import { Button } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack'
 import MealsOverviewScreen from './src/screens/MealsOverviewScreen';
 import { CATEGORIES } from './data/dummy-data';
