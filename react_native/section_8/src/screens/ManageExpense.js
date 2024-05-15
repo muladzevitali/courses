@@ -1,12 +1,19 @@
-import { View, StyleSheet, TextInput } from 'react-native'
-import { useContext, useLayoutEffect } from 'react'
+import { View, StyleSheet } from 'react-native'
+import { useContext, useLayoutEffect, useState } from 'react'
 import IconButton from '../components/ui/IconButton'
 import { GlobalStyles } from '../constants/styles'
 import { ExpensesContext } from '../../store/expenses-context'
 import ExpenseForm from '../components/ManageExpense/ExpenseForm'
+import { deleteExpense, storeExpense, updateExpense } from '../utils/http'
+import LoadingOverlay from '../components/ui/LoadingOverlay'
+import ErrorOverlay from '../components/ui/ErrorOverlay'
 
 
 const ManageExpense = ({ navigation, route }) => {
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [error, setError] = useState()
+
+
     const expenseId = route.params?.expenseId
     const isEditing = !!expenseId
     const screenTitle = isEditing ? 'Edit expense' : 'Add expense'
@@ -21,22 +28,56 @@ const ManageExpense = ({ navigation, route }) => {
         })
     }, [navigation, screenTitle])
 
-    const deleteExpenseHandler = () => {
-        expensesCtx.deleteExpense(expenseId)
-        navigation.goBack()
+    const deleteExpenseHandler = async () => {
+        setIsSubmitting(true)
+        try {
+            await deleteExpense(expenseId)
+            expensesCtx.deleteExpense(expenseId)
+            navigation.goBack()
+        } catch (error) {
+            setError(_ => "Couldn't delete expense")
+            setIsSubmitting(false)
+        }
     }
 
     const cancelExpenseChangeHandler = () => {
         navigation.goBack()
     }
 
-    const confirmExpenseHandler = (expenseData) => {
+    const confirmExpenseHandler = async (expenseData) => {
+        setIsSubmitting(true)
+
         if (isEditing) {
-            expensesCtx.updateExpense(expenseId, expenseData)
+            try {
+                expensesCtx.updateExpense(expenseId, expenseData)
+                await updateExpense(expenseId, expenseData)
+                navigation.goBack()
+            } catch (error) {
+                setError(_ => "Couldn't update expense")
+                setIsSubmitting(false)
+            }
+
         } else {
-            expensesCtx.addExpense(expenseData)
+            try {
+                const id = await storeExpense(expenseData)
+                expensesCtx.addExpense({ ...expenseData, id: id })
+                navigation.goBack()
+            } catch (error) {
+                setError(_ => "Couldn't add expense")
+                setIsSubmitting(false)
+            }
         }
-        navigation.goBack()
+    }
+
+    const errorHandler = () => {
+        setError(_ => null)
+    }
+
+    if (error && !isSubmitting) {
+        return <ErrorOverlay message={error} onSubmit={errorHandler} />
+    }
+    if (isSubmitting) {
+        return <LoadingOverlay />
     }
 
     return (
